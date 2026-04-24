@@ -1,0 +1,19 @@
+# Root-level ignores for monorepo setup
+.DS_Store
+Thumbs.db
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/dist-ssr/
+
+# Backend build output
+backend/target/
+
+# Local runtime data (H2)
+backend/data/*.mv.db
+backend/data/*.trace.db
+
+# Local tooling artifacts
+apache-maven-3.9.6/
+mvn.zip
