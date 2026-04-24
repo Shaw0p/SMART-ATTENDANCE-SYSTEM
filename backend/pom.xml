@@ -18,7 +18,7 @@
     <description>Smart Real-Time Attendance Tracking System — Spring Boot Backend</description>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>17</java.version>
     </properties>
 
     <dependencies>
