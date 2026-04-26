@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { GoogleOAuthProvider } from '@react-oauth/google';
 
@@ -89,9 +89,9 @@ export default function App() {
   return (
     <GoogleOAuthProvider clientId="593294445694-dis0dk8c396u4q48dmluigst2dai958c.apps.googleusercontent.com">
       <AuthProvider>
-        <BrowserRouter>
+        <HashRouter>
           <AppRoutes />
-        </BrowserRouter>
+        </HashRouter>
       </AuthProvider>
     </GoogleOAuthProvider>
   );
