@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "attendance_sessions")
+@Table(name = "class_sessions")
 @Data
 @Builder
 @NoArgsConstructor
@@ -52,6 +52,7 @@ public class ClassSession {
     @Column(name = "qr_token", nullable = false, unique = true)
     private String qrToken;
 
+    @Builder.Default
     @Column(name = "is_active")
     private boolean active = true;
 

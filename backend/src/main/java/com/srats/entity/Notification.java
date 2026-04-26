@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "app_notifications")
+@Table(name = "notifications")
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,7 +20,6 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // null = broadcast to all admins
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
@@ -30,9 +29,11 @@ public class Notification {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type")
+    @Builder.Default
     private Type type = Type.INFO;
 
     @Column(name = "is_read")
+    @Builder.Default
     private boolean read = false;
 
     @Column(name = "created_at")

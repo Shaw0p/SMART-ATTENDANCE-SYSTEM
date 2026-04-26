@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "app_users")
+@Table(name = "users")
 @Data
 @Builder
 @NoArgsConstructor
@@ -35,22 +35,17 @@ public class User {
 
     private String department;
 
-    // Students
     @Column(unique = true)
     private String rollNo;
 
     @Column(name = "study_year")
     private Integer year;
 
-
-    // Teachers / Admins
     @Column(unique = true)
     private String employeeId;
 
     private String designation;
-
     private String subject;
-
     private String phone;
 
     @Builder.Default

@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "attendance_logs",
+@Table(name = "attendance_records",
     uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "session_id"}))
 @Data
 @Builder
@@ -43,6 +43,7 @@ public class AttendanceRecord {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
+    @Builder.Default
     private Status status = Status.PRESENT;
 
     @PrePersist
