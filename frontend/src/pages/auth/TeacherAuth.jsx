@@ -97,6 +97,19 @@ export default function TeacherAuth() {
                 idToken: credentialResponse.credential
             });
 
+            // If it's a new teacher (no employee ID), show the registration form
+            if (!data.employeeId) {
+                setTab('register');
+                setForm(f => ({
+                    ...f,
+                    name: data.name,
+                    email: data.email,
+                    password: 'GOOGLE_USER_PROFILE_COMPLETION' 
+                }));
+                setError('Welcome! Please complete your faculty profile to continue.');
+                return;
+            }
+
             if (data.role !== 'TEACHER') {
                 setError('This account is registered as ' + data.role + '. Please use the correct portal.');
                 return;

@@ -89,6 +89,21 @@ export default function StudentAuth() {
                 idToken: credentialResponse.credential
             });
 
+            // If it's a new user (no roll number), don't log in yet.
+            // Fill the registration form and show it.
+            if (!data.rollNo) {
+                setTab('register');
+                setForm(f => ({
+                    ...f,
+                    name: data.name,
+                    email: data.email,
+                    // Password isn't needed for Google users but we need to pass validation
+                    password: 'GOOGLE_USER_PROFILE_COMPLETION' 
+                }));
+                setError('First time? Please complete your student profile below.');
+                return;
+            }
+
             if (data.role !== 'STUDENT') {
                 setError('This account is registered as ' + data.role + '. Please use the correct portal.');
                 return;
