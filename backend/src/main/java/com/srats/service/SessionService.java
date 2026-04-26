@@ -4,6 +4,7 @@ import com.srats.dto.SessionDto;
 import com.srats.entity.ClassSession;
 import com.srats.entity.Notification;
 import com.srats.entity.User;
+import com.srats.repository.UserRepository;
 import com.srats.repository.ClassSessionRepository;
 import com.srats.repository.NotificationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
