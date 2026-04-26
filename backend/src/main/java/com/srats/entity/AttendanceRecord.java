@@ -9,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "attendance_records",
+@Table(name = "attendance_logs",
     uniqueConstraints = @UniqueConstraint(columnNames = {"student_id", "session_id"}))
 @Data
 @Builder
