@@ -38,7 +38,8 @@ public class User {
     @Column(unique = true)
     private String rollNo;
 
-    private Integer year;
+    @Column(name = "study_year")
+    private Integer studyYear;
 
     @Column(unique = true)
     private String employeeId;

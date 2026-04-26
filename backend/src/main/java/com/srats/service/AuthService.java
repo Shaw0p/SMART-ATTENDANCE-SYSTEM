@@ -37,7 +37,7 @@ public class AuthService {
                 .role(req.getRoleEnum())
                 .department(req.getDepartment())
                 .rollNo(req.getRollNo())
-                .year(req.getYear())
+                .studyYear(req.getYear())
                 .employeeId(req.getEmployeeId())
                 .designation(req.getDesignation())
                 .subject(req.getSubject())

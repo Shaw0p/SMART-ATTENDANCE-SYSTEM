@@ -59,7 +59,7 @@ public class DataInitializer implements CommandLineRunner {
                     .role(User.Role.STUDENT)
                     .department("Computer Science")
                     .rollNo("CS001")
-                    .year(2)
+                    .studyYear(2)
                     .active(true)
                     .build();
             userRepository.save(student);
