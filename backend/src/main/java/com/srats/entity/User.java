@@ -20,38 +20,45 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "full_name", nullable = false)
     private String name;
 
-    @Column(nullable = false, unique = true)
+    @Column(name = "user_email", nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "user_password", nullable = false)
     private String password;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "user_role", nullable = false)
     private Role role;
 
+    @Column(name = "dept")
     private String department;
 
-    @Column(unique = true)
+    @Column(name = "roll_no", unique = true)
     private String rollNo;
 
     @Column(name = "study_year")
     private Integer studyYear;
 
-    @Column(unique = true)
+    @Column(name = "emp_id", unique = true)
     private String employeeId;
 
+    @Column(name = "user_designation")
     private String designation;
+
+    @Column(name = "user_subject")
     private String subject;
+
+    @Column(name = "user_phone")
     private String phone;
 
     @Builder.Default
+    @Column(name = "is_active")
     private boolean active = true;
 
-    @Column(updatable = false)
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
     @PrePersist
