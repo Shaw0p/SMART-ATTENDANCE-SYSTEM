@@ -49,15 +49,13 @@ public interface AttendanceRecordRepository extends JpaRepository<AttendanceReco
            "GROUP BY u.department")
     List<Object[]> getDeptWiseStats();
 
-    // Trend: daily attendance count — native query works on both H2 and MySQL
-    @Query(value = "SELECT FORMATDATETIME(a.marked_at, 'yyyy-MM-dd') as day, COUNT(a.id) as present " +
-                   "FROM attendance_records a " +
-                   "JOIN class_sessions s ON a.session_id = s.id " +
-                   "WHERE s.subject = :subject AND a.status = 'PRESENT' " +
-                   "AND a.marked_at >= :since " +
-                   "GROUP BY FORMATDATETIME(a.marked_at, 'yyyy-MM-dd') " +
-                   "ORDER BY day",
-           nativeQuery = true)
+    // Trend: daily attendance count — JPQL is database-agnostic
+    @Query("SELECT SUBSTRING(a.markedAt, 1, 10) as day, COUNT(a) as present " +
+           "FROM AttendanceRecord a " +
+           "WHERE a.session.subject = :subject AND a.status = 'PRESENT' " +
+           "AND a.markedAt >= :since " +
+           "GROUP BY SUBSTRING(a.markedAt, 1, 10) " +
+           "ORDER BY day")
     List<Object[]> getDailyTrend(@Param("subject") String subject, @Param("since") LocalDateTime since);
 }
 
