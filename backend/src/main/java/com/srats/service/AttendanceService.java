@@ -27,11 +27,6 @@ public class AttendanceService {
     @Autowired
     private NotificationRepository notificationRepo;
 
-    /**
-     * Core attendance marking logic. 1. Validate QR token → find active session
-     * 2. Check if already marked 3. Haversine distance check 4. Mark PRESENT or
-     * BLOCKED
-     */
     @Transactional
     public AttendanceDto.MarkAttendanceResponse markAttendance(User student,
             AttendanceDto.MarkAttendanceRequest req) {
@@ -58,8 +53,7 @@ public class AttendanceService {
             return response;
         }
 
-        // 3. GPS distance check — GPS still verified and logged
-        //    Effective radius = max(stored, 500m) to handle PC browser GPS inaccuracy
+        // 3. GPS distance check
         AttendanceRecord.Status status;
         double distance = -1;
 
@@ -69,22 +63,19 @@ public class AttendanceService {
                 && session.getLongitude() != null
                 && Math.abs(session.getLongitude()) > 0.001;
 
-        System.out.println(">>> GPS check: studentHasGps=" + studentHasGps
-                + " sessionHasGps=" + sessionHasGps
-                + " storedRadius=" + session.getRadius());
-
         if (studentHasGps && sessionHasGps) {
             distance = haversine(
                     req.getStudentLat(), req.getStudentLon(),
                     session.getLatitude(), session.getLongitude()
             );
             double effectiveRadius = session.getRadius() != null ? session.getRadius() : 50.0;
+            
             System.out.println(">>> STRICT GEOFENCE: Distance=" + Math.round(distance) + "m vs Limit=" + effectiveRadius + "m");
+            
             status = distance <= effectiveRadius
                     ? AttendanceRecord.Status.PRESENT
                     : AttendanceRecord.Status.BLOCKED;
         } else {
-            System.out.println(">>> No valid GPS on student/session — marking PRESENT");
             status = AttendanceRecord.Status.PRESENT;
         }
 
@@ -101,27 +92,22 @@ public class AttendanceService {
 
         attendanceRepo.save(record);
 
-        // 5. Notification for live feed
+        // 5. Notifications
         if (status == AttendanceRecord.Status.PRESENT) {
             notificationRepo.save(Notification.builder()
                     .message(student.getName() + " marked present in " + session.getSubject())
                     .type(Notification.Type.INFO)
                     .build());
         } else {
-            String msg = "PROXY BLOCKED — " + student.getName()
-                    + " attempted in " + session.getSubject()
-                    + " from " + Math.round(distance) + "m away";
             notificationRepo.save(Notification.builder()
-                    .message(msg)
+                    .message("PROXY BLOCKED — " + student.getName() + " was " + Math.round(distance) + "m away")
                     .type(Notification.Type.DANGER)
                     .build());
         }
 
         response.setSuccess(status == AttendanceRecord.Status.PRESENT);
         response.setStatus(status);
-        if (distance >= 0) {
-            response.setDistanceMeters(distance);
-        }
+        if (distance >= 0) response.setDistanceMeters(distance);
         response.setAllowedRadius(session.getRadius());
         response.setSubject(session.getSubject());
         response.setMarkedAt(record.getMarkedAt());
@@ -133,13 +119,9 @@ public class AttendanceService {
         return response;
     }
 
-    /**
-     * Returns subject-wise attendance breakdown for a student
-     */
     public List<AttendanceDto.SubjectAttendance> getSubjectWise(User student) {
         List<Object[]> rows = attendanceRepo.getSubjectWiseStats(student);
         List<AttendanceDto.SubjectAttendance> result = new ArrayList<>();
-
         for (Object[] row : rows) {
             AttendanceDto.SubjectAttendance sa = new AttendanceDto.SubjectAttendance();
             sa.setSubject((String) row[0]);
@@ -147,8 +129,7 @@ public class AttendanceService {
             sa.setPresent(((Number) row[2]).longValue());
             sa.setAbsent(sa.getTotal() - sa.getPresent());
             sa.setPercentage(sa.getTotal() == 0 ? 0 : (sa.getPresent() * 100.0 / sa.getTotal()));
-            sa.setStatusLabel(sa.getPercentage() >= 75 ? "GOOD"
-                    : sa.getPercentage() >= 65 ? "LOW" : "CRITICAL");
+            sa.setStatusLabel(sa.getPercentage() >= 75 ? "GOOD" : sa.getPercentage() >= 65 ? "LOW" : "CRITICAL");
             result.add(sa);
         }
         return result;
@@ -159,7 +140,6 @@ public class AttendanceService {
         long present = attendanceRepo.countByStudentAndStatus(student, AttendanceRecord.Status.PRESENT);
         long blocked = attendanceRepo.countByStudentAndStatus(student, AttendanceRecord.Status.BLOCKED);
         long total = present + blocked;
-
         s.setTotalPresent(present);
         s.setTotalAbsent(blocked);
         s.setTotalClasses(total);
@@ -168,37 +148,26 @@ public class AttendanceService {
         return s;
     }
 
-    // ─── Haversine Formula ───────────────────────────────────────────────────
     private double haversine(double lat1, double lon1, double lat2, double lon2) {
-        final int R = 6371000; // metres
+        final int R = 6371000;
         double dLat = Math.toRadians(lat2 - lat1);
         double dLon = Math.toRadians(lon2 - lon1);
-        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2)
-                + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2))
-                * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        double a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
         return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }
 
     private int calculateStreak(User student) {
         List<AttendanceRecord> records = attendanceRepo.findByStudentOrderByMarkedAtDesc(student);
-        if (records.isEmpty()) {
-            return 0;
-        }
-
+        if (records.isEmpty()) return 0;
         int streak = 0;
         LocalDateTime prev = LocalDateTime.now().toLocalDate().atStartOfDay().plusDays(1);
         for (AttendanceRecord r : records) {
-            if (r.getStatus() != AttendanceRecord.Status.PRESENT) {
-                continue;
-            }
+            if (r.getStatus() != AttendanceRecord.Status.PRESENT) continue;
             LocalDateTime day = r.getMarkedAt().toLocalDate().atStartOfDay();
-            long diff = java.time.Duration.between(day, prev).toDays();
-            if (diff <= 1) {
+            if (java.time.Duration.between(day, prev).toDays() <= 1) {
                 streak++;
                 prev = day;
-            } else {
-                break;
-            }
+            } else break;
         }
         return streak;
     }
