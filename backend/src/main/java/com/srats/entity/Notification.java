@@ -25,16 +25,17 @@ public class Notification {
     @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(nullable = false, length = 512)
+    @Column(name = "message", nullable = false, length = 512)
     private String message;
 
     @Enumerated(EnumType.STRING)
-    @Builder.Default
+    @Column(name = "type")
     private Type type = Type.INFO;
 
-    @Builder.Default
+    @Column(name = "is_read")
     private boolean read = false;
 
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @PrePersist

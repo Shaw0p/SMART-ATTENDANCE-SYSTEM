@@ -21,41 +21,38 @@ public class ClassSession {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Version
-    private Long version;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id", nullable = false)
     private User teacher;
 
-    @Column(nullable = false)
+    @Column(name = "subject", nullable = false)
     private String subject;
 
+    @Column(name = "section")
     private String section;
 
+    @Column(name = "room")
     private String room;
 
-    // Classroom GPS anchor
-    @Column(nullable = false)
+    @Column(name = "latitude", nullable = false)
     private Double latitude;
 
-    @Column(nullable = false)
+    @Column(name = "longitude", nullable = false)
     private Double longitude;
 
-    // Geofence radius in metres (default 50m)
-    @Builder.Default
+    @Column(name = "radius")
     private Double radius = 50.0;
 
     @Column(name = "start_time", nullable = false)
     private LocalDateTime startTime;
 
+    @Column(name = "end_time")
     private LocalDateTime endTime;
 
-    // UUID token embedded in the QR code
-    @Column(nullable = false, unique = true)
+    @Column(name = "qr_token", nullable = false, unique = true)
     private String qrToken;
 
-    @Builder.Default
+    @Column(name = "is_active")
     private boolean active = true;
 
     @PrePersist
