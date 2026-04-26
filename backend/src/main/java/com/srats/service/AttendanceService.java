@@ -77,9 +77,8 @@ public class AttendanceService {
                     req.getStudentLat(), req.getStudentLon(),
                     session.getLatitude(), session.getLongitude()
             );
-            double storedRadius = session.getRadius() != null ? session.getRadius() : 50.0;
-            double effectiveRadius = Math.max(storedRadius, 500.0);
-            System.out.println(">>> Distance=" + Math.round(distance) + "m effectiveRadius=" + effectiveRadius + "m");
+            double effectiveRadius = session.getRadius() != null ? session.getRadius() : 50.0;
+            System.out.println(">>> STRICT GEOFENCE: Distance=" + Math.round(distance) + "m vs Limit=" + effectiveRadius + "m");
             status = distance <= effectiveRadius
                     ? AttendanceRecord.Status.PRESENT
                     : AttendanceRecord.Status.BLOCKED;
