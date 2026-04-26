@@ -34,10 +34,10 @@ public class ClassSession {
     @Column(name = "room")
     private String room;
 
-    @Column(name = "latitude", nullable = false)
+    @Column(name = "latitude")
     private Double latitude;
 
-    @Column(name = "longitude", nullable = false)
+    @Column(name = "longitude")
     private Double longitude;
 
     @Column(name = "radius")

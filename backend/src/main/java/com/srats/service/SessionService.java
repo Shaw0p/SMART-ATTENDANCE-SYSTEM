@@ -18,13 +18,18 @@ import java.util.stream.Collectors;
 @Service
 public class SessionService {
 
+    @Autowired private UserRepository userRepository;
     @Autowired private ClassSessionRepository sessionRepository;
     @Autowired private NotificationRepository notificationRepository;
 
     @Transactional
     public SessionDto.SessionResponse startSession(User teacher, SessionDto.StartSessionRequest req) {
-        // Check for existing active session for this teacher and subject
-        sessionRepository.findByTeacherAndActiveTrue(teacher)
+        // Safety: ensure teacher is attached to the session
+        User teacherRef = userRepository.findById(teacher.getId())
+                .orElseThrow(() -> new RuntimeException("Authenticated user not found"));
+
+        // Check for existing active session
+        sessionRepository.findByTeacherAndActiveTrue(teacherRef)
                 .ifPresent(existing -> {
                     if (existing.getSubject().equalsIgnoreCase(req.getSubject())) {
                         throw new RuntimeException("A live session for " + req.getSubject() + " is already active.");
@@ -36,7 +41,7 @@ public class SessionService {
                 });
 
         ClassSession session = ClassSession.builder()
-                .teacher(teacher)
+                .teacher(teacherRef)
                 .subject(req.getSubject())
                 .section(req.getSection())
                 .room(req.getRoom())
@@ -55,7 +60,7 @@ public class SessionService {
 
         // Notify live feed
         notificationRepository.save(Notification.builder()
-                .message("Session started by " + teacher.getName() +
+                .message("Session started by " + teacherRef.getName() +
                          " — " + req.getSubject() +
                          (req.getRoom() != null ? " • Room " + req.getRoom() : ""))
                 .type(Notification.Type.INFO)
