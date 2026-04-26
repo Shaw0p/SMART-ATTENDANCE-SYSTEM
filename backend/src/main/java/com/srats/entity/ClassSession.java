@@ -25,35 +25,27 @@ public class ClassSession {
     @JoinColumn(name = "teacher_id", nullable = false)
     private User teacher;
 
-    @Column(name = "subject", nullable = false)
+    @Column(nullable = false)
     private String subject;
 
-    @Column(name = "section")
     private String section;
-
-    @Column(name = "room")
     private String room;
 
-    @Column(name = "latitude")
     private Double latitude;
-
-    @Column(name = "longitude")
     private Double longitude;
 
-    @Column(name = "radius")
+    @Builder.Default
     private Double radius = 50.0;
 
-    @Column(name = "start_time", nullable = false)
+    @Column(nullable = false)
     private LocalDateTime startTime;
 
-    @Column(name = "end_time")
     private LocalDateTime endTime;
 
-    @Column(name = "qr_token", nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String qrToken;
 
     @Builder.Default
-    @Column(name = "is_active")
     private boolean active = true;
 
     @PrePersist

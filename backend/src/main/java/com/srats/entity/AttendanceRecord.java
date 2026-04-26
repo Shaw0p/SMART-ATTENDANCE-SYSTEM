@@ -29,20 +29,13 @@ public class AttendanceRecord {
     @JoinColumn(name = "session_id", nullable = false)
     private ClassSession session;
 
-    @Column(name = "marked_at", nullable = false)
     private LocalDateTime markedAt;
 
-    @Column(name = "student_lat")
     private Double studentLat;
-
-    @Column(name = "student_lon")
     private Double studentLon;
-
-    @Column(name = "distance_meters")
     private Double distanceMeters;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
     @Builder.Default
     private Status status = Status.PRESENT;
 

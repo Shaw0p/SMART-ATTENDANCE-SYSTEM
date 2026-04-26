@@ -38,7 +38,6 @@ public class User {
     @Column(unique = true)
     private String rollNo;
 
-    @Column(name = "study_year")
     private Integer year;
 
     @Column(unique = true)
