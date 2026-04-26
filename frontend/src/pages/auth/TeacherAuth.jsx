@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../api/axios';
 import { Eye, EyeOff, QrCode } from 'lucide-react';
@@ -260,7 +260,7 @@ export default function TeacherAuth() {
 
                     <div style={{ marginTop: 32, textAlign: 'center' }}>
                         <span style={{ color: '#A3AED0', fontSize: 14, fontWeight: 500 }}>Student? </span>
-                        <a href="/auth/student" style={{ color: '#422AFB', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>Back to Student Portal</a>
+                        <Link to="/auth/student" style={{ color: '#422AFB', fontSize: 14, fontWeight: 700, textDecoration: 'none' }}>Back to Student Portal</Link>
                     </div>
                 </div>
             </div>
