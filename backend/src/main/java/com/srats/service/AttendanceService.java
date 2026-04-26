@@ -48,8 +48,9 @@ public class AttendanceService {
 
         ClassSession session = sessionOpt.get();
 
-        // 2. Already marked?
-        if (attendanceRepo.findByStudentAndSession(student, session).isPresent()) {
+        // 2. Already marked as PRESENT? (Allow retries if previously BLOCKED)
+        Optional<AttendanceRecord> existing = attendanceRepo.findByStudentAndSession(student, session);
+        if (existing.isPresent() && existing.get().getStatus() == AttendanceRecord.Status.PRESENT) {
             response.setSuccess(false);
             response.setStatus(AttendanceRecord.Status.PRESENT);
             response.setMessage("Attendance already marked for this session");
@@ -87,8 +88,9 @@ public class AttendanceService {
             status = AttendanceRecord.Status.PRESENT;
         }
 
-        // 4. Save record
+        // 4. Save/Update record
         AttendanceRecord record = AttendanceRecord.builder()
+                .id(existing.map(AttendanceRecord::getId).orElse(null))
                 .student(student)
                 .session(session)
                 .studentLat(req.getStudentLat())
